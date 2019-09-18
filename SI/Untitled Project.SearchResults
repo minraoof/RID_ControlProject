@@ -1,0 +1,7 @@
+---- CDC_ISBUSY Matches (6 in 4 files) ----
+Usbd_cdc_if.c (d:\vijay_prj\vijay_prj1\src):uint8_t CDC_ISBUSY(void)
+USB_Module.c (d:\vijay_prj\vijay_prj1\src):	if(CDC_ISBUSY() != FALSE)
+Vijay_Prj1.build_log.htm (d:\vijay_prj\vijay_prj1\mdk-arm\vijay_prj1):..\Src\USB_Module.c(298): warning:  #223-D: function "CDC_ISBUSY" declared implicitly
+Vijay_Prj1.build_log.htm (d:\vijay_prj\vijay_prj1\mdk-arm\vijay_prj1):  	if(CDC_ISBUSY() != FALSE)
+Vijay_Prj1.htm (d:\vijay_prj\vijay_prj1\mdk-arm\vijay_prj1):<P><STRONG><a name="[e5]"></a>CDC_ISBUSY</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, usbd_cdc_if.o(i.CDC_ISBUSY))
+Vijay_Prj1.htm (d:\vijay_prj\vijay_prj1\mdk-arm\vijay_prj1):<BR>[Calls]<UL><LI><a href="#[e5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CDC_ISBUSY

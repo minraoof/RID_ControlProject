@@ -1,0 +1,7 @@
+---- ADCif_SampleADC Matches (6 in 3 files) ----
+ADC.c (d:\vijay_prj\vijay_prj1\inc): * Function:		ADCif_SampleADC()
+ADC.c (d:\vijay_prj\vijay_prj1\inc):BYTE ADCif_SampleADC(WORD wType)
+ADC.c (d:\vijay_prj\vijay_prj1\src): * Function:		ADCif_SampleADC()
+ADC.c (d:\vijay_prj\vijay_prj1\src):BYTE ADCif_SampleADC(WORD wType)
+ADC.h (d:\vijay_prj\vijay_prj1\inc): * Function:		ADCif_SampleADC()
+ADC.h (d:\vijay_prj\vijay_prj1\inc):BYTE ADCif_SampleADC(WORD wType);

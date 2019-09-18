@@ -1,0 +1,29 @@
+---- toggle Matches (28 in 12 files) ----
+Stm32f102x6.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f102xb.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f103x6.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f103xb.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f103xe.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f103xg.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):/* EndPoint REGister MASK (no toggle fields) */
+Stm32f105xc.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):#define USB_OTG_HCINT_DTERR                     USB_OTG_HCINT_DTERR_Msk        /*!< Data toggle error */
+Stm32f105xc.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):#define USB_OTG_HCINTMSK_DTERRM                 USB_OTG_HCINTMSK_DTERRM_Msk    /*!< Data toggle error mask */
+Stm32f107xc.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):#define USB_OTG_HCINT_DTERR                     USB_OTG_HCINT_DTERR_Msk        /*!< Data toggle error */
+Stm32f107xc.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\cmsis\device\st\stm32f1xx\include):#define USB_OTG_HCINTMSK_DTERRM                 USB_OTG_HCINTMSK_DTERRM_Msk    /*!< Data toggle error mask */
+Stm32f1xx_hal_nor.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):    /* If DQ6 did not toggle between the two reads then return NOR_Success */
+Stm32f1xx_hal_nor.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):    /* If DQ6 did not toggle between the two reads then return NOR_Success */
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):   /* toggle first bit ? */     \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):   /* toggle second bit ?  */         \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle first bit ? */  \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle second bit ? */  \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle first bit ? */  \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle second bit ? */  \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle first bit ? */     \
+Stm32f1xx_hal_pcd.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):    /* toggle second bit ?  */         \
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Clear the data toggle bits for the endpoint IN/OUT*/
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Reset value of the data toggle bits for the endpoint out*/
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Clear the data toggle bits for the endpoint IN/OUT*/
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Clear the data toggle bits for the endpoint IN/OUT*/
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Reset value of the data toggle bits for the endpoint out*/
+Stm32f1xx_ll_usb.c (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\src):      /* Clear the data toggle bits for the endpoint IN/OUT*/
+Stm32f1xx_ll_usb.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):  uint8_t   toggle_in;     /*!< IN transfer current toggle flag.
+Stm32f1xx_ll_usb.h (d:\dev_project\vijay_prj\vijay_prj1\drivers\stm32f1xx_hal_driver\inc):  uint8_t   toggle_out;    /*!< OUT transfer current toggle flag
