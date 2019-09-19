@@ -49,6 +49,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "fatfs.h"
 #include "usb_device.h"
 
 /* USER CODE BEGIN Includes */
@@ -65,6 +66,10 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
+SD_HandleTypeDef hsd;
+
+SPI_HandleTypeDef hspi1;
+
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
@@ -79,6 +84,8 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_SDIO_SD_Init(void);
+static void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -122,6 +129,9 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_SDIO_SD_Init();
+  MX_FATFS_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   	Main_SystemInitialize();  
   /* USER CODE END 2 */
@@ -195,7 +205,7 @@ void SystemClock_Config(void)
 
     /**Configure the Systick interrupt time 
     */
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/100);
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
 
     /**Configure the Systick 
     */
@@ -227,10 +237,48 @@ static void MX_ADC1_Init(void)
 
     /**Configure Regular Channel 
     */
-  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* SDIO init function */
+static void MX_SDIO_SD_Init(void)
+{
+
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd.Init.ClockDiv = 0;
+
+}
+
+/* SPI1 init function */
+static void MX_SPI1_Init(void)
+{
+
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -322,24 +370,58 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, USR_LED2_Pin|USR_LED1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LCD_SPI_CS_Pin|SDCARD_CS_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pins : USR_BTN3_Pin USR_BTN2_Pin USR_BTN1_Pin */
-  GPIO_InitStruct.Pin = USR_BTN3_Pin|USR_BTN2_Pin|USR_BTN1_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, RELEY_1_Pin|RELAY_2_Pin|SDCARD_LED_Pin|USR_LED4_Pin 
+                          |USR_LED3_Pin|USR_LED2_Pin|USR_LED1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : USR_BTN2_Pin */
+  GPIO_InitStruct.Pin = USR_BTN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  HAL_GPIO_Init(USR_BTN2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : USR_LED2_Pin USR_LED1_Pin */
-  GPIO_InitStruct.Pin = USR_LED2_Pin|USR_LED1_Pin;
+  /*Configure GPIO pin : LCD_SPI_CS_Pin */
+  GPIO_InitStruct.Pin = LCD_SPI_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(LCD_SPI_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : RELEY_1_Pin RELAY_2_Pin */
+  GPIO_InitStruct.Pin = RELEY_1_Pin|RELAY_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : SDCARD_CS_Pin */
+  GPIO_InitStruct.Pin = SDCARD_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(SDCARD_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USR_BTN1_Pin */
+  GPIO_InitStruct.Pin = USR_BTN1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(USR_BTN1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SDCARD_LED_Pin USR_LED4_Pin */
+  GPIO_InitStruct.Pin = SDCARD_LED_Pin|USR_LED4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USR_LED3_Pin USR_LED2_Pin USR_LED1_Pin */
+  GPIO_InitStruct.Pin = USR_LED3_Pin|USR_LED2_Pin|USR_LED1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 

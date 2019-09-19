@@ -104,9 +104,11 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC1_CLK_ENABLE();
   
     /**ADC1 GPIO Configuration    
-    PA0-WKUP     ------> ADC1_IN0 
+    PA1     ------> ADC1_IN1
+    PA2     ------> ADC1_IN2
+    PA3     ------> ADC1_IN3 
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Pin = ADC_RESISTANCE_Pin|ADC_TEMPERATURE_Pin|ADC_MOTOR_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -132,15 +134,147 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
     __HAL_RCC_ADC1_CLK_DISABLE();
   
     /**ADC1 GPIO Configuration    
-    PA0-WKUP     ------> ADC1_IN0 
+    PA1     ------> ADC1_IN1
+    PA2     ------> ADC1_IN2
+    PA3     ------> ADC1_IN3 
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0);
+    HAL_GPIO_DeInit(GPIOA, ADC_RESISTANCE_Pin|ADC_TEMPERATURE_Pin|ADC_MOTOR_Pin);
 
     /* ADC1 interrupt DeInit */
     HAL_NVIC_DisableIRQ(ADC1_2_IRQn);
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */
+  }
+
+}
+
+void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if(hsd->Instance==SDIO)
+  {
+  /* USER CODE BEGIN SDIO_MspInit 0 */
+
+  /* USER CODE END SDIO_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_SDIO_CLK_ENABLE();
+  
+    /**SDIO GPIO Configuration    
+    PC8     ------> SDIO_D0
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD 
+    */
+    GPIO_InitStruct.Pin = SDCARD_DO_Pin|SDCARD_CK_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = SDCARD_CMD_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(SDCARD_CMD_GPIO_Port, &GPIO_InitStruct);
+
+    /* SDIO interrupt Init */
+    HAL_NVIC_SetPriority(SDIO_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(SDIO_IRQn);
+  /* USER CODE BEGIN SDIO_MspInit 1 */
+
+  /* USER CODE END SDIO_MspInit 1 */
+  }
+
+}
+
+void HAL_SD_MspDeInit(SD_HandleTypeDef* hsd)
+{
+
+  if(hsd->Instance==SDIO)
+  {
+  /* USER CODE BEGIN SDIO_MspDeInit 0 */
+
+  /* USER CODE END SDIO_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_SDIO_CLK_DISABLE();
+  
+    /**SDIO GPIO Configuration    
+    PC8     ------> SDIO_D0
+    PC12     ------> SDIO_CK
+    PD2     ------> SDIO_CMD 
+    */
+    HAL_GPIO_DeInit(GPIOC, SDCARD_DO_Pin|SDCARD_CK_Pin);
+
+    HAL_GPIO_DeInit(SDCARD_CMD_GPIO_Port, SDCARD_CMD_Pin);
+
+    /* SDIO interrupt DeInit */
+    HAL_NVIC_DisableIRQ(SDIO_IRQn);
+  /* USER CODE BEGIN SDIO_MspDeInit 1 */
+
+  /* USER CODE END SDIO_MspDeInit 1 */
+  }
+
+}
+
+void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if(hspi->Instance==SPI1)
+  {
+  /* USER CODE BEGIN SPI1_MspInit 0 */
+
+  /* USER CODE END SPI1_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_SPI1_CLK_ENABLE();
+  
+    /**SPI1 GPIO Configuration    
+    PA5     ------> SPI1_SCK
+    PA6     ------> SPI1_MISO
+    PA7     ------> SPI1_MOSI 
+    */
+    GPIO_InitStruct.Pin = LCD_SPI_SCK_Pin|LCD_SPI_MOSI_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = LCD_SPI_MISO_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(LCD_SPI_MISO_GPIO_Port, &GPIO_InitStruct);
+
+    /* SPI1 interrupt Init */
+    HAL_NVIC_SetPriority(SPI1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(SPI1_IRQn);
+  /* USER CODE BEGIN SPI1_MspInit 1 */
+
+  /* USER CODE END SPI1_MspInit 1 */
+  }
+
+}
+
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
+{
+
+  if(hspi->Instance==SPI1)
+  {
+  /* USER CODE BEGIN SPI1_MspDeInit 0 */
+
+  /* USER CODE END SPI1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_SPI1_CLK_DISABLE();
+  
+    /**SPI1 GPIO Configuration    
+    PA5     ------> SPI1_SCK
+    PA6     ------> SPI1_MISO
+    PA7     ------> SPI1_MOSI 
+    */
+    HAL_GPIO_DeInit(GPIOA, LCD_SPI_SCK_Pin|LCD_SPI_MISO_Pin|LCD_SPI_MOSI_Pin);
+
+    /* SPI1 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(SPI1_IRQn);
+  /* USER CODE BEGIN SPI1_MspDeInit 1 */
+
+  /* USER CODE END SPI1_MspDeInit 1 */
   }
 
 }
