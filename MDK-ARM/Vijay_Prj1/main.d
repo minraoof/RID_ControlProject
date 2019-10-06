@@ -24,7 +24,10 @@ vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
+vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_sdmmc.h
 vijay_prj1\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
@@ -56,3 +59,5 @@ vijay_prj1\main.o: ../Inc/Key.h
 vijay_prj1\main.o: ../Inc/RTC.h
 vijay_prj1\main.o: ../Inc/Power.h
 vijay_prj1\main.o: ../Inc/Temperature.h
+vijay_prj1\main.o: ../Inc/SDCard.h
+vijay_prj1\main.o: ../Inc/Utility.h

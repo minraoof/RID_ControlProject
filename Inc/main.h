@@ -59,46 +59,34 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define USR_BTN2_Pin GPIO_PIN_0
-#define USR_BTN2_GPIO_Port GPIOA
+#define MOTOR_SENSE_Pin GPIO_PIN_0
+#define MOTOR_SENSE_GPIO_Port GPIOC
+#define MODE1_Pin GPIO_PIN_1
+#define MODE1_GPIO_Port GPIOC
+#define MODE2_Pin GPIO_PIN_2
+#define MODE2_GPIO_Port GPIOC
 #define ADC_RESISTANCE_Pin GPIO_PIN_1
 #define ADC_RESISTANCE_GPIO_Port GPIOA
 #define ADC_TEMPERATURE_Pin GPIO_PIN_2
 #define ADC_TEMPERATURE_GPIO_Port GPIOA
-#define ADC_MOTOR_Pin GPIO_PIN_3
-#define ADC_MOTOR_GPIO_Port GPIOA
-#define LCD_SPI_SCK_Pin GPIO_PIN_5
-#define LCD_SPI_SCK_GPIO_Port GPIOA
-#define LCD_SPI_MISO_Pin GPIO_PIN_6
-#define LCD_SPI_MISO_GPIO_Port GPIOA
-#define LCD_SPI_MOSI_Pin GPIO_PIN_7
-#define LCD_SPI_MOSI_GPIO_Port GPIOA
-#define LCD_SPI_CS_Pin GPIO_PIN_4
-#define LCD_SPI_CS_GPIO_Port GPIOC
-#define RELEY_1_Pin GPIO_PIN_10
-#define RELEY_1_GPIO_Port GPIOB
-#define RELAY_2_Pin GPIO_PIN_11
-#define RELAY_2_GPIO_Port GPIOB
-#define SDCARD_CS_Pin GPIO_PIN_7
-#define SDCARD_CS_GPIO_Port GPIOC
-#define SDCARD_DO_Pin GPIO_PIN_8
-#define SDCARD_DO_GPIO_Port GPIOC
-#define USR_BTN1_Pin GPIO_PIN_11
-#define USR_BTN1_GPIO_Port GPIOC
-#define SDCARD_CK_Pin GPIO_PIN_12
-#define SDCARD_CK_GPIO_Port GPIOC
-#define SDCARD_CMD_Pin GPIO_PIN_2
-#define SDCARD_CMD_GPIO_Port GPIOD
-#define SDCARD_LED_Pin GPIO_PIN_3
-#define SDCARD_LED_GPIO_Port GPIOB
-#define USR_LED4_Pin GPIO_PIN_4
-#define USR_LED4_GPIO_Port GPIOB
-#define USR_LED3_Pin GPIO_PIN_5
-#define USR_LED3_GPIO_Port GPIOB
-#define USR_LED2_Pin GPIO_PIN_6
-#define USR_LED2_GPIO_Port GPIOB
-#define USR_LED1_Pin GPIO_PIN_7
-#define USR_LED1_GPIO_Port GPIOB
+#define RELAY1_Pin GPIO_PIN_4
+#define RELAY1_GPIO_Port GPIOC
+#define RELAY2_Pin GPIO_PIN_5
+#define RELAY2_GPIO_Port GPIOC
+#define LCD_I2C2_SCL_Pin GPIO_PIN_10
+#define LCD_I2C2_SCL_GPIO_Port GPIOB
+#define LCD_I2C2_SDA_Pin GPIO_PIN_11
+#define LCD_I2C2_SDA_GPIO_Port GPIOB
+#define LED_SDCARD_Pin GPIO_PIN_3
+#define LED_SDCARD_GPIO_Port GPIOB
+#define LED_TEST_Pin GPIO_PIN_4
+#define LED_TEST_GPIO_Port GPIOB
+#define LED_POL_Pin GPIO_PIN_5
+#define LED_POL_GPIO_Port GPIOB
+#define LED_CONT_Pin GPIO_PIN_6
+#define LED_CONT_GPIO_Port GPIOB
+#define LED_M2M_Pin GPIO_PIN_7
+#define LED_M2M_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**

@@ -25,7 +25,10 @@ vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
+vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_sdmmc.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
@@ -35,6 +38,7 @@ vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h
 vijay_prj1\usb_module.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h
 vijay_prj1\usb_module.o: ../Inc/GenericTypeDefs.h
 vijay_prj1\usb_module.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+vijay_prj1\usb_module.o: ../Inc/Version.h
 vijay_prj1\usb_module.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 vijay_prj1\usb_module.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 vijay_prj1\usb_module.o: ../Inc/usbd_cdc_if.h
@@ -49,3 +53,5 @@ vijay_prj1\usb_module.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usb
 vijay_prj1\usb_module.o: ../Inc/Utility.h
 vijay_prj1\usb_module.o: ../Inc/UserCmd.h
 vijay_prj1\usb_module.o: ../Inc/Module.h
+vijay_prj1\usb_module.o: ../Inc/SDCard.h
+vijay_prj1\usb_module.o: ../Inc/Key.h

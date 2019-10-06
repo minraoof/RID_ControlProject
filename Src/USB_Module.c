@@ -11,6 +11,7 @@
 //#define USB_IMPORTED
 //#define _SUPPRESS_PLIB_WARNING
 #include "USB_Module.h"
+#include "Version.h"
 
 #include "stdlib.h"
 #include <string.h>
@@ -19,6 +20,7 @@
 #include "UserCmd.h"
 #include "Module.h"
 #include "usbd_cdc_if.h"
+#include "SDCard.h"
 
 //*****************************************************************************
 // MACROS
@@ -33,7 +35,7 @@
 BYTE g_USB_UserCmd[USB_LENGTH_USERCMD], g_USB_PrintOut[USB_LENGTH_RESPONSE];
 WORD g_USB_DataIndex, g_USB_VGTotalSector;		// This is used for receiving data.
 DWORD g_USB_TotalLength, g_USB_SectorIndex;
-BYTE  g_USB_MessageNumber;
+BYTE g_USB_CheckSum[2], g_USB_ChecksumLowBit, g_USB_MessageNumber;
 
 USB_STATUS g_USB_State;
 USB_MESSAGE_QUEUE *g_USB_MessageHead;
@@ -261,13 +263,23 @@ void USB_CDC_ReceiveCallBack(uint8_t *buf, uint8_t yLen)
 {
 	if (yLen != 0)
 	{
-		if (USB_EVENT_USER_CMD == g_USB_State.wEvent)
+		if (yLen != 0)
 		{
-			USB_HandleUserCmdData((char*)buf, yLen);
-		}
-		else
-		{
-			USB_ParsingEvent((char*)buf, yLen);
+			if (USB_EVENT_WRITE == g_USB_State.wEvent)
+			{
+				USB_HandleWriteConfig(
+					(char*)buf,
+					yLen
+				);
+			}
+			else if (USB_EVENT_USER_CMD == g_USB_State.wEvent)
+			{
+				USB_HandleUserCmdData((char*)buf, yLen);
+			}
+			else
+			{
+				USB_ParsingEvent((char*)buf, yLen);
+			}
 		}
 	}
 }
@@ -289,59 +301,25 @@ void USB_CDC_ReceiveCallBack(uint8_t *buf, uint8_t yLen)
  *******************************************************************/
 void USB_EventHandler(void)
 {
-	USBif_SetUSBState();
-
-	/*if(g_USB_State.yUSB == FALSE)
-	{
-		return;
-	}*/
+	//USBif_SetUSBState();
 	
 	if(CDC_ISBUSY() != FALSE)
 	{
 		return;
 	}
 
-	if(g_USB_State.wEvent == USB_EVENT_USER_CMD_PROCESS)
+	if (USB_EVENT_READ == g_USB_State.wEvent)
 	{
-		g_USB_State.wEvent = USB_EVENT_NONE;
-
-		UserCmd_ParsingCmd(
-					(char*)g_USB_UserCmd,
-					USERCMD_SEND_USB
-				);
-
+		USB_HandleReadConfig();
 	}
-	else if(g_USB_State.wEvent == USB_EVENT_NONE)
+	else
 	{
 		if (NULL != g_USB_MessageHead)
 		{
 			USB_TxMessage();
 		}
 	}
-
-
 }
-
-/********************************************************************
- * Function:		USBif_SetUSBState()
- *
- * PreCondition:	None
- *
- * Input:			None
- *
- * Output:		None
- *
- * Side Effects:	None
- *
- * Overview:		Set the USB plug in status. It will check the port value.
- *
- * Note:			None
- *******************************************************************/
-void USBif_SetUSBState(void)
-{
-
-}
-
 
 /********************************************************************
  * Function:		USB_ParsingEvent()
@@ -360,13 +338,132 @@ void USBif_SetUSBState(void)
  *******************************************************************/
 void USB_ParsingEvent(CHAR* pData, BYTE yLen)
 {
-
-	if (pData[0] != 0 &&
-		g_USB_State.wEvent == USB_EVENT_NONE)
+	 uint8_t pResponse[20];
+	
+	if(USB_MESSAGE_PREFIX == (BYTE)pData[0])
 	{
-		g_USB_State.wEvent = USB_EVENT_USER_CMD;
-		memset(g_USB_UserCmd, 0x0, USB_LENGTH_USERCMD);
-		USB_HandleUserCmdData((char*)pData, yLen);
+		if ((USB_MESSAGE_ID_QUERY == (BYTE)pData[4] &&
+			0 == (BYTE)pData[1]) ||
+			USB_MESSAGE_ID_QUERY == (BYTE)pData[2])
+		{
+			BYTE yLength, yResult = FALSE;
+				
+			//g_USB_State.wEvent = USB_EVENT_QUERY;
+
+			pResponse[0] = USB_MESSAGE_PREFIX;				
+
+			if (USB_EVENT_NONE == g_USB_State.wEvent ||
+				USB_EVENT_CONFIGURATOR == g_USB_State.wEvent)
+			{
+				pResponse[1] = 0x0;
+				pResponse[2] = 0x0;
+				pResponse[3] = 0x6;
+
+				yLength = 4;
+
+				g_USB_State.wEvent = USB_EVENT_CONFIGURATOR;
+
+				yResult = TRUE;
+			}
+
+			if (TRUE == yResult)
+			{
+
+				pResponse[yLength++] = USB_MESSAGE_ID_QUERY;
+
+				pResponse[yLength++] = VERSION_HARDWARE_NUMBER;
+				pResponse[yLength++] = VERSION_MAIN_NUMBER;
+				pResponse[yLength++] = VERSION_SUB_NUMBER;
+				pResponse[yLength++] = VERSION_SUB_CHAR;
+
+				//if (USB_MESSAGE_ID_QUERY == (BYTE)pData[2])
+				{
+					if (0xFF == (BYTE)pResponse[yLength])
+					{
+					pResponse[yLength] = 0;
+					}
+
+					yLength++;
+				}
+
+				pResponse[3] = yLength;
+
+				CDC_Transmit_FS(&pResponse[0], yLength);
+			}
+		}
+		else if (USB_MESSAGE_ID_READ == (BYTE)pData[4] &&
+			0 == (BYTE)pData[1])
+		{
+			if (USB_EVENT_CONFIGURATOR == g_USB_State.wEvent)
+			{
+				g_USB_State.wEvent = USB_EVENT_READ;
+
+				g_USB_DataIndex = 0;
+				
+				g_USB_CheckSum[0] = 0;
+				g_USB_CheckSum[1] = 0;
+				g_USB_ChecksumLowBit = 0;
+				
+				pResponse[0] = USB_MESSAGE_PREFIX;
+				pResponse[1] = 0;//(SFLASH_LENGTH_TOTAL_CONFIG >> 16) & 0xff;
+				pResponse[2] = (SFLASH_LENGTH_TOTAL_CONFIG  >> 8) & 0xff;
+				pResponse[3] = SFLASH_LENGTH_TOTAL_CONFIG  & 0xff;
+				pResponse[4] = USB_MESSAGE_ID_READ;
+
+				CDC_Transmit_FS(&pResponse[0], 5);
+			}
+		}
+		else if (USB_MESSAGE_ID_WRITE == (BYTE)pData[4] &&
+			0 == (BYTE)pData[1])
+		{
+			if (USB_EVENT_CONFIGURATOR == g_USB_State.wEvent)
+			{
+				g_USB_State.wEvent = USB_EVENT_WRITE;
+
+				g_USB_TotalLength = (BYTE)pData[1];
+				g_USB_TotalLength <<= 8;
+				g_USB_TotalLength += (BYTE)pData[2];
+				g_USB_TotalLength <<= 8;
+				g_USB_TotalLength += (BYTE)pData[3];
+				//g_USB_TotalLength -= 2;		// The last 2 bytes is checksum so no need to write
+
+				g_USB_DataIndex = 0;
+
+				g_USB_CheckSum[0] = 0;
+				g_USB_CheckSum[1] = 0;
+				g_USB_ChecksumLowBit = 0;
+
+				/*SFlashif_WriteDataToBuffer(
+					(PBYTE)&pData[5],
+					g_USB_DataIndex,
+					59
+				);*/
+
+				USB_CalculateChecksum(
+					&pData[5],
+					59
+				);
+				
+				g_USB_DataIndex += 59;
+			}
+		}
+		else if (USB_MESSAGE_ID_RESET == (BYTE)pData[4] &&
+			0 == (BYTE)pData[1])
+		{
+			// The disconnect signal
+			//Reset();
+			g_USB_State.wEvent = USB_EVENT_NONE;
+		}
+	}
+	else
+	{
+		if (pData[0] != 0 &&
+			g_USB_State.wEvent == USB_EVENT_NONE)
+		{
+			g_USB_State.wEvent = USB_EVENT_USER_CMD;
+			memset(g_USB_UserCmd, 0x0, USB_LENGTH_USERCMD);
+			USB_HandleUserCmdData((char*)pData, yLen);
+		}
 	}
 }
 
@@ -439,16 +536,174 @@ void USB_HandleUserCmdData(CHAR *pString, BYTE yLen)
 			}
 			else
 			{
-				g_USB_State.wEvent = USB_EVENT_USER_CMD_PROCESS;
+				g_USB_State.wEvent = USB_EVENT_NONE;
 
-				/*UserCmd_ParsingCmd(
-					(char*)g_USB_UserCmd,
-					USERCMD_SEND_USB
-				);*/
-
+				UserCmd_ParsingCmd(
+							(char*)g_USB_UserCmd,
+							USERCMD_SEND_USB
+						);
 				return;
 			}
 		}
 	}
 }
+/********************************************************************
+ * Function:		USB_HandleReadConfig()
+ *
+ * PreCondition:	None
+ *
+ * Input:			None
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Read all the config in flash memory and send to the terminal.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_HandleReadConfig(void)
+{
+	CHAR pData[USB_LENGTH_RESPONSE + 2];
+	BYTE yLength;
+
+	memset(pData, 0x0, USB_LENGTH_RESPONSE + 2);
+	
+	if ((SFLASH_LENGTH_TOTAL_CONFIG - g_USB_DataIndex) < USB_LENGTH_RESPONSE)
+	{
+		yLength = SFLASH_LENGTH_TOTAL_CONFIG - g_USB_DataIndex;
+	}
+	else
+	{
+		yLength = USB_LENGTH_RESPONSE;
+	}
+
+	if (yLength != 0)
+	{
+		/*SFlash_ReadData(
+			(PBYTE)pData,
+			(DWORD)g_USB_DataIndex,
+			(WORD)yLength
+		);*/
+
+		USB_CalculateChecksum(
+			pData,
+			yLength
+		);
+	}
+
+	if ((SFLASH_LENGTH_TOTAL_CONFIG - g_USB_DataIndex) < USB_LENGTH_RESPONSE)
+	{
+		g_USB_DataIndex = 0;
+		g_USB_State.wEvent = USB_EVENT_NONE;
+	}
+	else
+	{
+		g_USB_DataIndex += yLength;
+	}
+	
+	CDC_Transmit_FS((uint8_t*)pData, yLength);
+}
+
+/********************************************************************
+ * Function:		USB_HandleWriteConfig()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pString: The input config data value
+ *				BYTE yLength: The length of data.
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the data and write into the flash. It will compare with
+ *				the checksum value in the end of data.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_HandleWriteConfig(
+	CHAR* pString,
+	BYTE yLength
+)
+{
+	if ((g_USB_TotalLength - g_USB_DataIndex) < USB_LENGTH_RESPONSE)
+	{
+		BYTE yTemp = g_USB_TotalLength - g_USB_DataIndex;
+
+		if (yTemp != 0)
+		{
+			/*SFlashif_WriteDataToBuffer(
+				(PBYTE)pString,
+				g_USB_DataIndex,
+				yTemp
+			);
+
+			g_USB_DataIndex = 0;
+			g_USB_TotalLength = SFLASH_LENGTH_HTTP_SERVER * 2;
+			g_USB_State.wEvent = USB_EVENT_WRITE_MDM_LINK;
+
+			memset(g_USB_UserCmd, 0x0, USB_LENGTH_USERCMD);
+			USB_HandleWriteMDMServerLink(
+				&pString[yTemp],
+				yLength - yTemp
+			);*/
+		}
+	}
+	else
+	{
+		/*SFlashif_WriteDataToBuffer(
+			(PBYTE)pString,
+			g_USB_DataIndex,
+			yLength
+		);*/
+
+		USB_CalculateChecksum(
+			pString,
+			yLength
+		);
+		
+		g_USB_DataIndex += yLength;
+	}
+}
+
+/********************************************************************
+ * Function:		USB_CalculateChecksum()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR *pString: The input data
+ *				BYTE yLength: The length of input data
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the input data's checksum.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_CalculateChecksum(
+	CHAR *pString,
+	BYTE yLength
+)
+{
+	BYTE yIndex;
+
+	for (yIndex = 0; yIndex < yLength; yIndex++)
+	{
+		if ((yIndex + g_USB_ChecksumLowBit) % 2 == 0)
+		{
+			if (0xff - g_USB_CheckSum[0] < (BYTE)pString[yIndex])
+			{
+				g_USB_CheckSum[1]++;
+			}
+		}
+
+		g_USB_CheckSum[(yIndex + g_USB_ChecksumLowBit) % 2] += (BYTE)pString[yIndex];
+	}
+
+	g_USB_ChecksumLowBit = (g_USB_ChecksumLowBit + yLength) % 2;
+}
+
 

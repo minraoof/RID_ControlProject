@@ -103,13 +103,13 @@ void Key_ParseKey(void)
 
 	if (KEY_STATE_RELEASE == g_Key_State.yState)
 	{
-		if (0x07 != yKey &&
+		if (0x03 != yKey &&
 			g_Key_State.yKey != yKey)
 		{
 			HAL_TIM_Base_Stop_IT(&htim2);
 		}
 
-		if (0x07 == yKey)
+		if (0x03 == yKey)
 		{
 			HAL_TIM_Base_Stop_IT(&htim2);
 		}
@@ -122,7 +122,7 @@ void Key_ParseKey(void)
 	else if (KEY_STATE_PRESS == g_Key_State.yState ||
 		KEY_STATE_LONG_PRESS == g_Key_State.yState)
 	{
-		if (0x07 == yKey)
+		if (0x03 == yKey)
 		{
 			g_Key_State.yState = KEY_STATE_RELEASE;
 
@@ -215,13 +215,13 @@ BYTE Key_GetKeyData(void)
 {
 	BYTE yKey = 0;
 
-	yKey |= HAL_GPIO_ReadPin(USR_BTN3_GPIO_Port, USR_BTN3_Pin);
+	yKey |= HAL_GPIO_ReadPin(MOTOR_SENSE_GPIO_Port, MOTOR_SENSE_Pin);
 	yKey <<= 1;
 
-	yKey |= HAL_GPIO_ReadPin(USR_BTN2_GPIO_Port, USR_BTN2_Pin);
+	yKey |= HAL_GPIO_ReadPin(MODE1_GPIO_Port, MODE1_Pin);
 	yKey <<= 1;
 
-	yKey |= HAL_GPIO_ReadPin(USR_BTN1_GPIO_Port, USR_BTN1_Pin);
+	yKey |= HAL_GPIO_ReadPin(MODE2_GPIO_Port, MODE2_Pin);
 
 	return yKey;
 }

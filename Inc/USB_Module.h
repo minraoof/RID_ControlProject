@@ -45,14 +45,24 @@
 #include "GenericTypeDefs.h"
 
 /* Exported types ------------------------------------------------------------*/
+
+#define USB_MESSAGE_PREFIX						0x02
+#define USB_MESSAGE_ID_QUERY					0xC1
+#define USB_MESSAGE_ID_WRITE					0xC2
+#define USB_MESSAGE_ID_READ					0xC3
+#define USB_MESSAGE_ID_RESET					0xC4
+
  typedef enum
  {
  	USB_EVENT_NONE = 0,
 
  	USB_EVENT_CONFIGURATOR,
- 	USB_EVENT_USER_CMD,
-	USB_EVENT_USER_CMD_PROCESS,
 
+	USB_EVENT_QUERY,
+	USB_EVENT_WRITE,
+	USB_EVENT_READ,
+	
+ 	USB_EVENT_USER_CMD,
  	USB_EVENT_STOP
  }USB_CONFIG_EVENT;
 
@@ -173,23 +183,6 @@
   * Note:			None
   *******************************************************************/
  void USB_EventHandler(void);
- 
- /********************************************************************
-  * Function:		 USBif_SetUSBState()
-  *
-  * PreCondition:	 None
-  *
-  * Input:			 None
-  *
-  * Output: 	 None
-  *
-  * Side Effects:	 None
-  *
-  * Overview:		 Set the USB plug in status. It will check the port value.
-  *
-  * Note:			 None
-  *******************************************************************/
- void USBif_SetUSBState(void);
 
  /********************************************************************
   * Function:		USB_ParsingEvent()
@@ -224,6 +217,65 @@
   * Note:			None
   *******************************************************************/
  void USB_HandleUserCmdData(CHAR *pString, BYTE yLen);
+/********************************************************************
+ * Function:		USB_HandleReadConfig()
+ *
+ * PreCondition:	None
+ *
+ * Input:			None
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Read all the config in flash memory and send to the terminal.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_HandleReadConfig(void);
+
+/********************************************************************
+ * Function:		USB_HandleWriteConfig()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pString: The input config data value
+ *				BYTE yLength: The length of data.
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the data and write into the flash. It will compare with
+ *				the checksum value in the end of data.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_HandleWriteConfig(
+	CHAR* pString,
+	BYTE yLength
+);
+
+ /********************************************************************
+ * Function:		USB_CalculateChecksum()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR *pString: The input data
+ *				BYTE yLength: The length of input data
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the input data's checksum.
+ *
+ * Note:			None
+ *******************************************************************/
+void USB_CalculateChecksum(
+	CHAR *pString,
+	BYTE yLength
+);
 
 #endif /* __USBMODULE_H */
 

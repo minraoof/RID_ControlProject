@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SDCard.h"
+#include "RTC.h"
+
 
 
 //*****************************************************************************
@@ -140,11 +143,19 @@ WORD UserCmd_ParsingATCommand(CHAR* pCmd)
 	{
 		wCmd = USERCMD_CMD_LBAT;
 	}
+	else if (0 == StrCmpN(pCmd, "TIMESTAMP", 9))
+	{
+		wCmd =  USERCMD_CMD_TIMESTAMP;
+	}
 	else if (pCmd[0] == 'S')
 	{		
-		if (0 == StrCmpN(&pCmd[1], "YSUP", 4))
+		if (0 == StrCmpN(&pCmd[1], "YSTEMUPTIME", 11))
 		{
 			wCmd = USERCMD_CMD_SYSTEMUPTIME;
+		}
+		if (0 == StrCmpN(&pCmd[1], "DCARDTEST", 9))
+		{
+			wCmd = USERCMD_CMD_SDCARDTEST;
 		}
 	}
 
@@ -190,7 +201,19 @@ BYTE UserCmd_HandleATCommand(
 			
 		case USERCMD_CMD_SYSTEMUPTIME:
 		{
-			yResult = UserCmd_SystemUptimeCommand(&pCmd[5]);;
+			yResult = UserCmd_SystemUptimeCommand(&pCmd[12]);
+		}
+			break;
+
+		case USERCMD_CMD_TIMESTAMP:
+		{
+			yResult = UserCmd_TimeStampCommand(&pCmd[9]);
+		}
+			break;
+			
+		case USERCMD_CMD_SDCARDTEST:
+		{
+			yResult =UserCmd_SDCardTestCommand(&pCmd[10]);;
 		}
 			break;
 
@@ -235,7 +258,7 @@ BYTE UserCmd_VersionCommand(CHAR *pCmd)
 	}
 	else
 	{
-		strcpy(g_UserCmd_Response, "VijayPrj Ver ");
+		strcpy(g_UserCmd_Response, "RIDControl_Ver ");
 		ItoStr(VERSION_HARDWARE_NUMBER, &g_UserCmd_Response[strlen(g_UserCmd_Response)], 0);
 		strcat(g_UserCmd_Response, ".");
 		ItoStr(VERSION_MAIN_NUMBER, &g_UserCmd_Response[strlen(g_UserCmd_Response)], 0);
@@ -390,7 +413,9 @@ BYTE UserCmd_LBATCommand(CHAR* pCmd)
  *******************************************************************/
 BYTE UserCmd_SystemUptimeCommand(CHAR* pCmd)
 {
-	if (pCmd[0] == 0)
+	if (pCmd[0] == 0 ||
+		(pCmd[0] == '?' &&
+		pCmd[1] == 0))
 	{
 		DWORD dwTime = RTCif_GetSystemUptime();
 		
@@ -403,3 +428,122 @@ BYTE UserCmd_SystemUptimeCommand(CHAR* pCmd)
 
 	return TRUE;
 }
+
+/********************************************************************
+ * Function:		UserCmd_TimeStampCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle the Current Time command time command
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_TimeStampCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE;
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		RTC_Date_String_Setting t_Setting;
+		DWORD dwTime = RTCif_GetTimeStamp();
+		BYTE yLength;
+
+		t_Setting.ySimplifyMonth = TRUE;
+		t_Setting.yWeekDay = TRUE;
+		t_Setting.yYear = FALSE;
+		
+		RTCif_GetDateString(
+			g_UserCmd_Response,
+			dwTime,
+			t_Setting);
+
+		yLength= strlen(g_UserCmd_Response);
+		g_UserCmd_Response[yLength++] = ' ';
+
+		RTCif_GetTimeString(
+			&g_UserCmd_Response[yLength],
+			dwTime);
+
+		yResult = TRUE;
+	}
+	else if (pCmd[0] == '=')
+	{	
+		BYTE yIndex = 1;
+		DWORD dwTimeVal = 0;
+
+		do
+		{
+			while(pCmd[yIndex] != 0)
+			{
+				if (pCmd[yIndex] < '0' ||
+					pCmd[yIndex] > '9')
+				{
+					break;
+				}
+					
+				yIndex++;
+			}
+
+			if (0 != pCmd[yIndex])
+			{
+				break;
+			}
+
+			dwTimeVal = StoI(&pCmd[1]);
+
+			if(dwTimeVal < 1325376000)
+			{
+				break;
+			}
+
+			RTCif_SetTimeStamp(dwTimeVal);
+			
+			yResult = TRUE;
+			
+		}while(0);
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+}
+
+/********************************************************************
+ * Function:		UserCmd_SDCardTestCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Test for SDCard.
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDCardTestCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE;
+	
+	if (pCmd[0] == 0 ||
+		(pCmd[0] == '?' &&
+		pCmd[1] == 0))
+	{
+		SDCard_TestWrite();
+	}
+	yResult = TRUE;
+	return yResult;
+}
+

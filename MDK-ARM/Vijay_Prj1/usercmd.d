@@ -25,7 +25,10 @@ vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
+vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
+vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_sd.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_sdmmc.h
 vijay_prj1\usercmd.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
@@ -45,3 +48,4 @@ vijay_prj1\usercmd.o: ../Inc/RTC.h
 vijay_prj1\usercmd.o: ../Inc/Power.h
 vijay_prj1\usercmd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 vijay_prj1\usercmd.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+vijay_prj1\usercmd.o: ../Inc/SDCard.h

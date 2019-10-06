@@ -26,16 +26,38 @@
 //*****************************************************************************
 // VARIABLES
 //*****************************************************************************
+typedef struct
+{
+	WORD wYear;
+	BYTE yMonth;
+	BYTE yDay;
+	BYTE yWeekDate;
+	BYTE yHour;
+	BYTE yMin;
+	BYTE ySec;
+}RTC_DATE_FORMAT;
 
 typedef struct
 {
-	BYTE ySysTick;
-	
-	BYTE yHalfSecond;
+	BYTE ySimplifyMonth:1;
+	BYTE yYear:1;
+	BYTE yWeekDay:1;
+	BYTE yReserved:5;
+}RTC_Date_String_Setting;
 
-	BYTE yLED1;
+typedef struct
+{	
+	BYTE yOneSecond;
 
-	BYTE yLED2;
+	BYTE yLedM2M;
+
+	BYTE yLedCONT;
+
+	BYTE yLedPOL;
+
+	BYTE yLedTest;
+
+	BYTE yLedSDcard;
 
 	BYTE yBatterySample;
 
@@ -50,13 +72,19 @@ typedef union
 {
 	struct
 	{
-		BYTE yLED1Flag;
+		BYTE yLedM2MFlag;
 
-		BYTE yLED2Flag;
+		BYTE yLedCONTFlag;
+
+		BYTE yLedPOLFlag;
+
+		BYTE yLedTestFlag;
+
+		BYTE yLedSDcardFlag;
 
 		BYTE yBatterySampleFlag;
 		
-		DWORD yReserved:28;		
+		DWORD yReserved:25;		
 	}Flags;
 	DWORD dwFlags;
 }RTC_TIMER_FLAG;
@@ -83,7 +111,7 @@ void RTC_Initialize(void);
 
 
 /********************************************************************
- * Function:		RTC_SetTimerEnable()
+ * Function:		RTC_SetOneSecTimerEnable()
  *
  * PreCondition:	None
  *
@@ -97,7 +125,7 @@ void RTC_Initialize(void);
  *
  * Note:			None
  *******************************************************************/
-void RTC_SetTimerEnable(BYTE yEnable);
+void RTC_SetOneSecTimerEnable(BYTE yEnable);
 
 
 /********************************************************************
@@ -193,7 +221,7 @@ void RTCif_SetLEDTimer(
 );
 
 /********************************************************************
- * Function:		RTCif_SetLEDTimer()
+ * Function:		RTCif_GetLEDTimer()
  *
  * PreCondition:	None
  *
@@ -228,6 +256,78 @@ BYTE RTCif_GetLEDTimer(BYTE yLED);
 DWORD RTCif_GetSystemUptime(void);
 
 /********************************************************************
+ * Function:		RTCif_GetTimeStamp()
+ *
+ * PreCondition:	None
+ *
+ * Input:			None
+ *
+ * Output:		DWORD: The timestamp
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the current timestamp
+ *
+ * Note:			None
+ *******************************************************************/
+DWORD RTCif_GetTimeStamp(void);
+
+/********************************************************************
+ * Function:		RTCif_SetTimeStamp()
+ *
+ * PreCondition:	None
+ *
+ * Input:			DWORD:Time
+ *
+ * Output:		None:
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Set the current timestamp
+ *
+ * Note:			None
+ *******************************************************************/
+void RTCif_SetTimeStamp(DWORD dwTime);
+
+/********************************************************************
+ * Function:		RTC_TimeStampToDate()
+ *
+ * PreCondition:	None
+ *
+ * Input:			RTC_DATE_FORMAT tDate: The date time value.
+ *
+ * Output:		DWORD: The time stamp.
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Translate the date time value to time stamp.
+ *
+ * Note:			None
+ *******************************************************************/
+DWORD RTC_DateToTimeStamp(RTC_DATE_FORMAT tDate);
+
+/********************************************************************
+ * Function:		RTC_TimeStampToDate()
+ *
+ * PreCondition:	None
+ *
+ * Input:			DWORD dwTime: The time stamp.
+ *				RTC_DATE_FORMAT *pDate: The result pointer.
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Translate the timestamp to the date-time format.
+ *
+ * Note:			None
+ *******************************************************************/
+void RTC_TimeStampToDate(
+	DWORD dwTime,
+	RTC_DATE_FORMAT *pDate
+);
+
+/********************************************************************
  * Function:		RTCif_TimeSecondsToString()
  *
  * PreCondition:	None
@@ -247,5 +347,51 @@ DWORD RTCif_GetSystemUptime(void);
 void RTCif_TimeSecondsToString(
 	DWORD dwTime,
 	CHAR* pString
+);
+
+/********************************************************************
+ * Function:		RTCif_GetDateString()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR*: The current date string
+ *				DWORD dwTimeStamp: The time stamp
+ *				RTC_Date_String_Setting t_Setting: The string format setting
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the current date string. It needs to release the memory
+ *				after using this string.
+ *
+ * Note:			None
+ *******************************************************************/
+void RTCif_GetDateString(
+	CHAR* pDate,
+	DWORD dwTimeStamp,
+	RTC_Date_String_Setting t_Setting
+);
+
+/********************************************************************
+ * Function:		RTCif_GetTimeString()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR*: The current time string
+ *				DWORD dwTimeStamp: The time stamp
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Get the current time string. It needs to release the memory
+ *				after using this string.
+ *
+ * Note:			None
+ *******************************************************************/
+void RTCif_GetTimeString(
+	CHAR* pTime,
+	DWORD dwTimeStamp
 );
 #endif /* RTC_H_ */

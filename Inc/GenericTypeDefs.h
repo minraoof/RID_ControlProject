@@ -52,13 +52,31 @@
 
 /* Exported macro ------------------------------------------------------------*/
  typedef void                    VOID;
- #define BYTE	uint8_t
- #define WORD	uint16_t
- #define DWORD	uint32_t
+/* This type MUST be 8 bit */
+typedef unsigned char	BYTE;
+
+/* These types MUST be 16 bit */
+typedef short			SHORT;
+typedef unsigned short	WORD;
+typedef unsigned short	WCHAR;
+
+/* These types MUST be 16 bit or 32 bit */
+typedef int				INT;
+typedef unsigned int	UINT;
+
+/* These types MUST be 32 bit */
+typedef long			LONG;
+typedef unsigned long	DWORD;
+typedef char			CHAR;
+
+
+/*#define BYTE	uint8_t
+#define WORD	uint16_t
+#define DWORD	uint32_t
 
 #define CHAR	char
 #define SHORT	int16_t
-#define LONG	int32_t
+#define LONG	int32_t*/
  typedef unsigned char*          PBYTE;
 
 /* Exported functions ------------------------------------------------------- */

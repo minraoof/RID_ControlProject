@@ -15,33 +15,29 @@
 #include "Key.h"
 #include "stm32f1xx_hal.h"
 
-#define UI_LED1_ON	HAL_GPIO_WritePin(GPIOB, USR_LED1_Pin, GPIO_PIN_SET)
-#define UI_LED1_OFF	HAL_GPIO_WritePin(GPIOB, USR_LED1_Pin, GPIO_PIN_RESET)
+#define UI_LED_M2M_ON	HAL_GPIO_WritePin(GPIOB, LED_M2M_Pin, GPIO_PIN_SET)
+#define UI_LED_M2M_OFF	HAL_GPIO_WritePin(GPIOB, LED_M2M_Pin, GPIO_PIN_RESET)
+#define UI_LED_M2M_TOGGLE HAL_GPIO_TogglePin(GPIOB, LED_M2M_Pin)
 
-#define UI_LED2_ON	HAL_GPIO_WritePin(GPIOB, USR_LED2_Pin, GPIO_PIN_SET)
-#define UI_LED2_OFF	HAL_GPIO_WritePin(GPIOB, USR_LED2_Pin, GPIO_PIN_RESET)
+#define UI_LED_CONT_ON	HAL_GPIO_WritePin(GPIOB, LED_CONT_Pin, GPIO_PIN_SET)
+#define UI_LED_CONT_OFF	HAL_GPIO_WritePin(GPIOB, LED_CONT_Pin, GPIO_PIN_RESET)
+#define UI_LED_CONT_TOGGLE HAL_GPIO_TogglePin(GPIOB, LED_CONT_Pin)
 
+#define UI_LED_POL_ON	HAL_GPIO_WritePin(GPIOB, LED_POL_Pin, GPIO_PIN_SET)
+#define UI_LED_POL_OFF	HAL_GPIO_WritePin(GPIOB, LED_POL_Pin, GPIO_PIN_RESET)
+#define UI_LED_POL_TOGGLE HAL_GPIO_TogglePin(GPIOB, LED_POL_Pin)
+
+#define UI_LED_TEST_ON	HAL_GPIO_WritePin(GPIOB, LED_TEST_Pin, GPIO_PIN_SET)
+#define UI_LED_TEST_OFF	HAL_GPIO_WritePin(GPIOB, LED_TEST_Pin, GPIO_PIN_RESET)
+#define UI_LED_TEST_TOGGLE HAL_GPIO_TogglePin(GPIOB, LED_TEST_Pin)
+
+
+#define UI_LED_SDCARD_ON	HAL_GPIO_WritePin(GPIOC, LED_SDCARD_Pin, GPIO_PIN_SET)
+#define UI_LED_SDCARD_OFF	HAL_GPIO_WritePin(GPIOC, LED_SDCARD_Pin, GPIO_PIN_RESET)
+#define UI_LED_SDCARD_TOGGLE HAL_GPIO_TogglePin(GPIOC, LED_SDCARD_Pin)
 //*****************************************************************************
 // MACROS
 //*****************************************************************************
-
-
-typedef enum
-{
-	UI_LED1 = 0,
-	UI_LED2
-}UI_LED;
-
-typedef enum
-{
-	UI_LED_STATE_OFF = 0,
-	UI_LED_STATE_ON
-}UI_LED_STATE;
-
-//*****************************************************************************
-// VARIABLES
-//*****************************************************************************
-
 
 typedef enum
 {
@@ -49,27 +45,31 @@ typedef enum
 	UI_STATE_STOP
 }UI_STATE;
 
-typedef struct
+typedef enum
 {
-	BYTE yState;
+	UI_LED_M2M = 0,
+	UI_LED_CONT,
+	UI_LED_POL,
+	UI_LED_TEST,
+	UI_LED_SDCARD,
+	UI_LED_TOTAL
+}UI_LED;
 
-	// Used for the LED blinking process.
-	BYTE yLEDState[2];
-
-	//For Key press Flag
-	BYTE yKeyPressFlag;
-}UI_STATUS;
-
-typedef struct
+typedef enum
 {
-	WORD wData;
-}UI_ADCSCAN_DATA;
+	UI_FAST_LED_M2M = 0,
+	UI_FAST_LED_CONT,
+	UI_FAST_LED_POL,
+	UI_FAST_LED_TEST,
+	UI_FAST_LED_SDCARD,
+	UI_FAST_LED_TOTAL
+}UI_FAST_LED;
 
-typedef struct
+typedef enum
 {
-	BYTE yData;
-	BYTE yEvent;
-}UI_CHANNEL_DATA;
+	UI_LED_STATE_OFF = 0,
+	UI_LED_STATE_ON
+}UI_LED_STATE;
 
 typedef enum
 {
@@ -77,7 +77,26 @@ typedef enum
 	UI_EVENT_BATTERY_HANDLER
 }UI_EVENT;
 
+//*****************************************************************************
+// VARIABLES
+//*****************************************************************************
 
+typedef struct
+{
+	BYTE yState;
+
+	// Used for the LED blinking process.
+	BYTE yLEDState[UI_LED_TOTAL];
+
+	//For Key press Flag
+	BYTE yKeyPressFlag;
+}UI_STATUS;
+
+typedef struct
+{
+	BYTE yLED;
+	BYTE yLoop;
+}UI_LED_FastBlink;
 
 //*****************************************************************************
 // FUNCTION DEFINITION
@@ -187,4 +206,42 @@ void UIif_SetBlinkLED(BYTE yLED);
  * Note:			None
  *******************************************************************/
 void UI_StopBlinkLED(BYTE yLED);
+
+/********************************************************************
+ * Function:		UIif_StartFastBlinkLED()
+ *
+ * PreCondition:	None
+ *
+ * Input:			BYTE yLED: The LED type.
+ 					BYTE yLoop
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Blink first for LED
+ *
+ * Note:			None
+ *******************************************************************/
+void UIif_StartFastBlinkLED(
+	BYTE yLED,
+	BYTE yLoop
+);
+
+/********************************************************************
+ * Function:		UIif_HandleFastBlinkLEDTimeout()
+ *
+ * PreCondition:	None
+ *
+ * Input:			None
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Timeout for fast blink
+ *
+ * Note:			None
+ *******************************************************************/
+void UIif_HandleFastBlinkLEDTimeout(void);
 #endif /* UI_H_ */

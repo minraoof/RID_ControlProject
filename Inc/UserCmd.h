@@ -75,7 +75,10 @@ typedef enum
 	USERCMD_CMD_NONE = 0,
 	USERCMD_CMD_LBAT,
 	USERCMD_CMD_VER,
-USERCMD_CMD_SYSTEMUPTIME
+	USERCMD_CMD_SYSTEMUPTIME,
+  USERCMD_CMD_TIMESTAMP,
+
+	USERCMD_CMD_SDCARDTEST
 }USERCMD_CMD_TYPE;
 
 
@@ -206,6 +209,40 @@ BYTE UserCmd_LBATCommand(CHAR* pCmd);
  * Note:			None
  *******************************************************************/
 BYTE UserCmd_SystemUptimeCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:    UserCmd_TimeStampCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle the Sys up time command
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_TimeStampCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:		UserCmd_SDCardTestCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:		None
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Test for SDCard.
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDCardTestCommand(CHAR* pCmd);
 
 #endif /* __USERCMD_H__ */
 

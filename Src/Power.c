@@ -48,7 +48,7 @@ void Power_Initialize(void)
 	g_Power_SampleCount = 0;
 	g_Power_LowBatteryThreshold = POWER_BATTERY_GAUGE_1_4;
 
-	RTCif_SetBatterySampleTime(2);
+	//RTCif_SetBatterySampleTime(2);
 }
 
 /********************************************************************
