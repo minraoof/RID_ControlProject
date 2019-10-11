@@ -41,6 +41,8 @@ USB_STATUS g_USB_State;
 USB_MESSAGE_QUEUE *g_USB_MessageHead;
 USB_DATA g_USB_Data;
 
+CHAR pTemData[100];
+
 //*****************************************************************************
 // FUNCTION DEFINITION
 //*****************************************************************************
@@ -312,6 +314,20 @@ void USB_EventHandler(void)
 	{
 		USB_HandleReadConfig();
 	}
+	else if (USB_EVENT_WRITE_PROCESS == g_USB_State.wEvent)
+	{
+		USB_HandleReadConfig();
+	}
+	
+	else if(g_USB_State.wEvent == USB_EVENT_USER_CMD_PROCESS)
+	{
+		g_USB_State.wEvent = USB_EVENT_NONE;
+
+		UserCmd_ParsingCmd(
+					(char*)g_USB_UserCmd,
+					USERCMD_SEND_USB
+				);
+	}
 	else
 	{
 		if (NULL != g_USB_MessageHead)
@@ -339,6 +355,9 @@ void USB_EventHandler(void)
 void USB_ParsingEvent(CHAR* pData, BYTE yLen)
 {
 	 uint8_t pResponse[20];
+
+	memset(pTemData, 0x00, 100);
+	Strncpy(pTemData, pData, yLen);
 	
 	if(USB_MESSAGE_PREFIX == (BYTE)pData[0])
 	{
@@ -386,7 +405,7 @@ void USB_ParsingEvent(CHAR* pData, BYTE yLen)
 					yLength++;
 				}
 
-				pResponse[3] = yLength;
+				//pResponse[3] = yLength;
 
 				CDC_Transmit_FS(&pResponse[0], yLength);
 			}
@@ -433,18 +452,19 @@ void USB_ParsingEvent(CHAR* pData, BYTE yLen)
 				g_USB_CheckSum[1] = 0;
 				g_USB_ChecksumLowBit = 0;
 
-				/*SFlashif_WriteDataToBuffer(
+				SDCardif_WriteDataToBuffer(
 					(PBYTE)&pData[5],
 					g_USB_DataIndex,
-					59
-				);*/
+					28
+				);
 
 				USB_CalculateChecksum(
 					&pData[5],
-					59
+					28
 				);
 				
-				g_USB_DataIndex += 59;
+				//g_USB_DataIndex += 28;
+				g_USB_State.wEvent = USB_EVENT_WRITE;
 			}
 		}
 		else if (USB_MESSAGE_ID_RESET == (BYTE)pData[4] &&
@@ -536,12 +556,15 @@ void USB_HandleUserCmdData(CHAR *pString, BYTE yLen)
 			}
 			else
 			{
-				g_USB_State.wEvent = USB_EVENT_NONE;
+				/*g_USB_State.wEvent = USB_EVENT_NONE;
 
 				UserCmd_ParsingCmd(
 							(char*)g_USB_UserCmd,
 							USERCMD_SEND_USB
-						);
+						);*/
+				g_USB_State.wEvent = USB_EVENT_USER_CMD_PROCESS;
+
+				
 				return;
 			}
 		}
@@ -652,11 +675,11 @@ void USB_HandleWriteConfig(
 	}
 	else
 	{
-		/*SFlashif_WriteDataToBuffer(
+		SDCardif_WriteDataToBuffer(
 			(PBYTE)pString,
 			g_USB_DataIndex,
 			yLength
-		);*/
+		);
 
 		USB_CalculateChecksum(
 			pString,

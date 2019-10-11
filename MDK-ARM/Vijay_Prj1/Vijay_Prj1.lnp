@@ -20,6 +20,7 @@
 "vijay_prj1\usbd_cdc_if.o"
 "vijay_prj1\stm32f1xx_it.o"
 "vijay_prj1\stm32f1xx_hal_msp.o"
+"vijay_prj1\file_handling.o"
 "vijay_prj1\stm32f1xx_hal_gpio_ex.o"
 "vijay_prj1\stm32f1xx_hal_pcd.o"
 "vijay_prj1\stm32f1xx_hal_pcd_ex.o"

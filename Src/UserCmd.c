@@ -15,7 +15,7 @@
 
 #include "SDCard.h"
 #include "RTC.h"
-
+#include "SDCard.h"
 
 
 //*****************************************************************************
@@ -23,6 +23,9 @@
 //*****************************************************************************
 #define USERCMD_RESPONSE_LENGTH				256
 
+#define IsUpper(c)	(((c)>='A')&&((c)<='Z'))
+#define IsLower(c)	(((c)>='a')&&((c)<='z'))
+#define IsDigit(c)	(((c)>='0')&&((c)<='9'))
 
 //*****************************************************************************
 // VARIABLES
@@ -153,9 +156,29 @@ WORD UserCmd_ParsingATCommand(CHAR* pCmd)
 		{
 			wCmd = USERCMD_CMD_SYSTEMUPTIME;
 		}
-		if (0 == StrCmpN(&pCmd[1], "DCARDTEST", 9))
+		else if (0 == StrCmpN(&pCmd[1], "DCHKSIZE", 8))
 		{
-			wCmd = USERCMD_CMD_SDCARDTEST;
+			wCmd = USERCMD_CMD_SDCHKSIZE;
+		}
+		else if (0 == StrCmpN(&pCmd[1], "DMKFILE", 7))
+		{
+			wCmd = USERCMD_CMD_SDMKFILE;
+		}
+		else if (0 == StrCmpN(&pCmd[1], "DWRFILE", 7))
+		{
+			wCmd = USERCMD_CMD_SDWRFILE;
+		}		
+		else if (0 == StrCmpN(&pCmd[1], "DRDFILE", 7))
+		{
+			wCmd = USERCMD_CMD_SDRDFILE;
+		}
+		else if (0 == StrCmpN(&pCmd[1], "DRMFILE", 7))
+		{
+			wCmd = USERCMD_CMD_SDRMFILE;
+		}
+		else if (0 == StrCmpN(&pCmd[1], "DSKWRFILE", 9))
+		{
+			wCmd = USERCMD_CMD_SDSKWRFILE;
 		}
 	}
 
@@ -210,10 +233,40 @@ BYTE UserCmd_HandleATCommand(
 			yResult = UserCmd_TimeStampCommand(&pCmd[9]);
 		}
 			break;
-			
-		case USERCMD_CMD_SDCARDTEST:
+
+		case USERCMD_CMD_SDCHKSIZE:
 		{
-			yResult =UserCmd_SDCardTestCommand(&pCmd[10]);;
+			yResult =UserCmd_SDChksizeCommand(&pCmd[9]);
+		}
+			break;
+
+		case USERCMD_CMD_SDMKFILE:
+		{
+			yResult =UserCmd_SDmkfileCommand(&pCmd[8]);
+		}
+			break;
+
+		case USERCMD_CMD_SDWRFILE:
+		{
+			yResult =UserCmd_SDwrfileCommand(&pCmd[8]);
+		}
+			break;
+
+		case USERCMD_CMD_SDRDFILE:
+		{
+			yResult =UserCmd_SDrdfileCommand(&pCmd[8]);
+		}
+			break;
+
+		case USERCMD_CMD_SDRMFILE:
+		{
+			yResult =UserCmd_SDrmfileCommand(&pCmd[8]);
+		}
+			break;
+
+		case USERCMD_CMD_SDSKWRFILE:
+		{
+			yResult =UserCmd_SDskwrfileCommand(&pCmd[10]);
 		}
 			break;
 
@@ -506,6 +559,7 @@ BYTE UserCmd_TimeStampCommand(CHAR* pCmd)
 
 			RTCif_SetTimeStamp(dwTimeVal);
 			
+			strcpy(g_UserCmd_Response, "OK");
 			yResult = TRUE;
 			
 		}while(0);
@@ -519,31 +573,449 @@ BYTE UserCmd_TimeStampCommand(CHAR* pCmd)
 }
 
 /********************************************************************
- * Function:		UserCmd_SDCardTestCommand()
+ * Function:		UserCmd_SDChksizeCommand()
  *
  * PreCondition:	None
  *
  * Input:			CHAR* pCmd: The input command
  *
- * Output:		None
+ * Output:			BYTE
  *
  * Side Effects:	None
  *
- * Overview:		Test for SDCard.
+ * Overview:		Handle the check size command.
  *
  * Note:			None
  *******************************************************************/
-BYTE UserCmd_SDCardTestCommand(CHAR* pCmd)
+BYTE UserCmd_SDChksizeCommand(CHAR* pCmd)
 {
 	BYTE yResult = FALSE;
-	
+
 	if (pCmd[0] == 0 ||
-		(pCmd[0] == '?' &&
-		pCmd[1] == 0))
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
 	{
-		SDCard_TestWrite();
+		//SDCard_CheckSize();
+		strcpy(g_UserCmd_Response, "Free Size = ");
+
+		ItoStr(SDCard_GetFreeSize(),
+				&g_UserCmd_Response[strlen(g_UserCmd_Response)],
+				0);
+
+		strcat(g_UserCmd_Response,"\r\nTotal Size = ");
+
+		ItoStr(SDCard_GetTotalSize(),
+				&g_UserCmd_Response[strlen(g_UserCmd_Response)],
+				0);
+		
+		yResult = TRUE;
 	}
-	yResult = TRUE;
+	else
+	{
+		return FALSE;
+	}
+
 	return yResult;
 }
 
+/********************************************************************
+ * Function:		UserCmd_SDmkfileCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle the create file command
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDmkfileCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE, yLength = 0, yIndex = 0;
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		return FALSE;
+	}
+	else if (pCmd[0] == '=')
+	{
+			yIndex = 1;
+			yLength = 0;
+
+			while (pCmd[yIndex] != 0)
+			{
+				if (pCmd[yIndex] >= '0' &&
+					pCmd[yIndex] <= '9')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'A' &&
+					pCmd[yIndex] <= 'Z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'a' &&
+					pCmd[yIndex] <= 'z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] == '.')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else
+				{
+					yIndex = 0;
+					break;
+				}
+			}
+
+			if(yIndex == 0)
+			{
+				return FALSE;
+			}
+
+			yResult = TRUE;
+
+			SDCard_Createfile(&pCmd[1]);
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+
+}
+
+/********************************************************************
+ * Function:		UserCmd_SDwrfileCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle write command for SD card.
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDwrfileCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE, yIndex = 0 , yLength = 0;
+	CHAR pFilename[100], pData[100];
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		return FALSE;
+	}
+	else if (pCmd[0] == '=')
+	{
+		memset(pFilename, 0x00, 100);
+		memset(pData, 0x00, 100);
+
+		do
+		{
+			yIndex = 1;
+			yLength = 0;
+
+			while (pCmd[yIndex] != 0)
+			{
+				if (pCmd[yIndex] >= '0' &&
+					pCmd[yIndex] <= '9')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'A' &&
+					pCmd[yIndex] <= 'Z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'a' &&
+					pCmd[yIndex] <= 'z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] == '.')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if(pCmd[yIndex] == ',')
+				{
+					 Strncpy(pFilename, &pCmd[1], yLength);
+					 yIndex++;
+					 strcpy(pData, &pCmd[yIndex]);
+					 strcat(pData, "\r\n");
+					 
+					 break;
+				}
+				else
+				{
+					yIndex = 0;
+					break;
+				}
+			}
+
+			if(yIndex == 0)
+			{
+				break;
+			}
+
+			yResult = TRUE;
+
+			SDCard_UpdateFile(pFilename, pData);
+
+		}while(0);
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+
+}
+/********************************************************************
+ * Function:		UserCmd_SDskwrfileCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle write command for SD card.
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDskwrfileCommand(CHAR* pCmd)
+{
+
+	BYTE yResult = FALSE, yIndex = 0 , yLength = 0;
+	BYTE xIndex;
+	CHAR pFilename[100], pData[100];
+	WORD wSekIndex;
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		return FALSE;
+	}
+	else if (pCmd[0] == '=')
+	{
+		memset(pFilename, 0x00, 100);
+		memset(pData, 0x00, 100);
+
+		do
+		{
+			yIndex = 1;
+			yLength = 0;
+
+			while (pCmd[yIndex] != 0)
+			{
+				if (pCmd[yIndex] >= '0' &&
+					pCmd[yIndex] <= '9')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'A' &&
+					pCmd[yIndex] <= 'Z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] >= 'a' &&
+					pCmd[yIndex] <= 'z')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if (pCmd[yIndex] == '.')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else if(pCmd[yIndex] == ',')
+				{
+					 Strncpy(pFilename, &pCmd[1], yLength);
+					 yIndex++;
+					 //strcpy(pData, &pCmd[yIndex]);					 
+					 break;
+				}
+				else
+				{
+					yIndex = 0;
+					break;
+				}
+			}			
+
+			if(yIndex == 0)
+			{
+				break;
+			}
+			
+			yLength = 0;
+			xIndex = yIndex;
+
+			while (pCmd[yIndex] != 0)
+			{
+				if(pCmd[yIndex] == ',')
+				{
+					 Strncpy(pData, &pCmd[xIndex], yLength);
+					 yIndex++;
+					 //strcpy(pData, &pCmd[yIndex]);					 
+					 break;
+				}
+				else
+				{
+					yIndex++;
+					yLength++;
+				}
+			}
+			
+			if(yLength == 0)
+			{
+				break;
+			}
+			
+			yLength = 0;
+			xIndex = yIndex;
+			
+			while (pCmd[yIndex] != 0)
+			{
+				if (pCmd[yIndex] >= '0' &&
+					pCmd[yIndex] <= '9')
+				{
+					yIndex++;
+					yLength++;
+				}
+				else
+				{
+					yIndex = 0;
+					break;
+				}
+			}
+			
+			if(yIndex == 0)
+			{
+				break;
+			}
+
+			wSekIndex = StoI(&pCmd[xIndex]);		
+
+			yResult = TRUE;
+
+			
+			SDCard_SeekWriteFile (pFilename, pData, wSekIndex, strlen(pData));
+
+		}while(0);
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+}
+/********************************************************************
+ * Function:		UserCmd_SDrdfileCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle read command for SD card
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDrdfileCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE;
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		return FALSE;
+	}
+	else if (pCmd[0] == '=')
+	{
+		SDCard_ReadFile(&pCmd[1], &g_UserCmd_Response[0]);
+
+		yResult = TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+
+}
+
+/********************************************************************
+ * Function:		UserCmd_SDrmfileCommand()
+ *
+ * PreCondition:	None
+ *
+ * Input:			CHAR* pCmd: The input command
+ *
+ * Output:			BYTE
+ *
+ * Side Effects:	None
+ *
+ * Overview:		Handle delete command for SD card
+ *
+ * Note:			None
+ *******************************************************************/
+BYTE UserCmd_SDrmfileCommand(CHAR* pCmd)
+{
+	BYTE yResult = FALSE;
+
+	if (pCmd[0] == 0 ||
+	(pCmd[0] == '?' &&
+	pCmd[1] == 0))
+	{
+		return FALSE;
+	}
+	else if (pCmd[0] == '=')
+	{
+		SDCard_Removefile(&pCmd[1]);
+		
+		yResult = TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return yResult;
+
+}

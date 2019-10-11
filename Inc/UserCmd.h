@@ -75,10 +75,18 @@ typedef enum
 	USERCMD_CMD_NONE = 0,
 	USERCMD_CMD_LBAT,
 	USERCMD_CMD_VER,
+  //Time related Command
 	USERCMD_CMD_SYSTEMUPTIME,
   USERCMD_CMD_TIMESTAMP,
 
-	USERCMD_CMD_SDCARDTEST
+  //SDCard Command
+	USERCMD_CMD_SDCARDCMD,
+  USERCMD_CMD_SDCHKSIZE,    //Check for the size of SDcard
+  USERCMD_CMD_SDMKFILE,     //Create the file
+  USERCMD_CMD_SDWRFILE,     //Write dat to the file
+  USERCMD_CMD_SDRDFILE,     //Read data to the file
+  USERCMD_CMD_SDRMFILE,      //Delete file from the SD card
+  USERCMD_CMD_SDSKWRFILE,	//Seek Write
 }USERCMD_CMD_TYPE;
 
 
@@ -228,21 +236,106 @@ BYTE UserCmd_SystemUptimeCommand(CHAR* pCmd);
 BYTE UserCmd_TimeStampCommand(CHAR* pCmd);
 
 /********************************************************************
- * Function:		UserCmd_SDCardTestCommand()
+ * Function:    UserCmd_SDChksizeCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle the check size command.
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_SDChksizeCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:    UserCmd_SDmkfileCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle the create file command
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_SDmkfileCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:    UserCmd_SDwrfileCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle write command for SD card.
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_SDwrfileCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:		UserCmd_SDskwrfileCommand()
  *
  * PreCondition:	None
  *
  * Input:			CHAR* pCmd: The input command
  *
- * Output:		None
+ * Output:			BYTE
  *
  * Side Effects:	None
  *
- * Overview:		Test for SDCard.
+ * Overview:		Handle write command for SD card.
  *
  * Note:			None
  *******************************************************************/
-BYTE UserCmd_SDCardTestCommand(CHAR* pCmd);
+BYTE UserCmd_SDskwrfileCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:    UserCmd_SDrdfileCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle read command for SD card
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_SDrdfileCommand(CHAR* pCmd);
+
+/********************************************************************
+ * Function:    UserCmd_SDrmfileCommand()
+ *
+ * PreCondition:  None
+ *
+ * Input:     CHAR* pCmd: The input command
+ *
+ * Output:      BYTE
+ *
+ * Side Effects:  None
+ *
+ * Overview:    Handle delete command for SD card
+ *
+ * Note:      None
+ *******************************************************************/
+BYTE UserCmd_SDrmfileCommand(CHAR* pCmd);
 
 #endif /* __USERCMD_H__ */
 

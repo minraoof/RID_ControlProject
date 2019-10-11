@@ -140,7 +140,6 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   	Main_SystemInitialize(); 
-  	UIif_StartFastBlinkLED(UI_FAST_LED_M2M, 255);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -489,7 +488,7 @@ void Main_SystemInitialize(void)
 
 	Power_Initialize();
 
-	TS_Initialize();
+	//TS_Initialize();
 
 	SDCard_InitializeModule();
 }
